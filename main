@@ -1,0 +1,54 @@
+pip install cdqa
+import pandas as pd
+from ast import literal_eval
+import json
+from cdqa.utils.filters import filter_paragraphs
+from cdqa.utils.download import download_model, download_bnpp_data
+from cdqa.pipeline.cdqa_sklearn import QAPipeline
+
+# from cdqa.utils.converters import df2squad
+
+# # Converting dataframe to SQuAD format
+# json_data = df2squad(df=df, squad_version='v1.1', output_dir='.', filename='dataset-name.json')
+
+# Download data and models
+download_bnpp_data(dir='./data/bnpp_newsroom_v1.1/')
+download_model(model='bert-squad_1.1', dir='./models')
+
+import pandas as pd
+from ast import literal_eval
+import json
+from cdqa.utils.filters import filter_paragraphs
+from cdqa.utils.download import download_model, download_bnpp_data
+from cdqa.pipeline.cdqa_sklearn import QAPipeline
+
+# from cdqa.utils.converters import df2squad
+
+# # Converting dataframe to SQuAD format
+# json_data = df2squad(df=df, squad_version='v1.1', output_dir='.', filename='dataset-name.json')
+
+# Download data and models
+download_bnpp_data(dir='./data/bnpp_newsroom_v1.1/')
+download_model(model='bert-squad_1.1', dir='./models')
+
+# Loading QAPipeline with CPU version of BERT Reader pretrained on SQuAD 1.1
+cdqa_pipeline = QAPipeline(reader='models/bert_qa.joblib')
+# Use models/bert_qa_vGPU-sklearn.joblib if we are using GPU
+
+
+# Put the path to your json file in SQuAD format here
+path_to_data = './data/bnpp_newsroom-v1_2.json'
+cdqa_pipeline.fit_reader(path_to_data)
+
+
+# Fitting the retriever to the list of documents in the dataframe
+cdqa_pipeline.fit_retriever(df)
+
+# Sending a question to the pipeline and getting prediction
+query = 'Since when does the Excellence Program of BNP Paribas exist?'
+prediction = cdqa_pipeline.predict(query)
+
+print('query: {}\n'.format(query))
+print('answer: {}\n'.format(prediction[0]))
+print('title: {}\n'.format(prediction[1]))
+print('paragraph: {}\n'.format(prediction[2]))
